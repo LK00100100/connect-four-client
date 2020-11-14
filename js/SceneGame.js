@@ -22,6 +22,7 @@ class SceneGame extends Phaser.Scene {
         this.ghostRedSprites = [];
         this.ghostYellowSprites = [];
 
+        this.piecePlacedSound;
         this.initBoard();
     }
 
@@ -34,11 +35,15 @@ class SceneGame extends Phaser.Scene {
         this.load.image('board-front', 'assets/img/board-front.png');
 
         this.load.image('btn-reset', 'assets/img/btn-reset.png');
+
+        /** Audio */
+        this.load.audio('piece-placed', ['assets/audio/squit.ogg']);
     }
 
     create() {
         this.cameras.main.setBackgroundColor('#dddddd'); //white
 
+       // piecePlacedSound =  this.sound.add("piece-placed");
 
         this.drawBoard();
         this.drawGhosts();
@@ -199,6 +204,8 @@ class SceneGame extends Phaser.Scene {
             return;
 
         this.animatePlacePiece(rowPlaced, col, this.currentPlayer);
+
+       // this.piecePlacedSound.play();
 
         let isWinner = this.checkVictoryQuick(rowPlaced, col);
 
