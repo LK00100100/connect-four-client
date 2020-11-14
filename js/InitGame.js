@@ -1,5 +1,4 @@
-//this file starts the game.
-
+//this file starts the game. load this js file last
 
 let config = {
     type: Phaser.AUTO,

@@ -43,7 +43,7 @@ class SceneGame extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#dddddd'); //white
 
-       // piecePlacedSound =  this.sound.add("piece-placed");
+        this.piecePlacedSound =  this.sound.add("piece-placed");
 
         this.drawBoard();
         this.drawGhosts();
@@ -205,7 +205,7 @@ class SceneGame extends Phaser.Scene {
 
         this.animatePlacePiece(rowPlaced, col, this.currentPlayer);
 
-       // this.piecePlacedSound.play();
+        this.piecePlacedSound.play();
 
         let isWinner = this.checkVictoryQuick(rowPlaced, col);
 
