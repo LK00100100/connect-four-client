@@ -1,0 +1,22 @@
+{
+  "name": "connect-four-client",
+  "version": "1.0.0",
+  "description": "connnect four client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LK00100100/connect-four-client.git"
+  },
+  "author": "lk00100100",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LK00100100/connect-four-client/issues"
+  },
+  "homepage": "https://github.com/LK00100100/connect-four-client#readme",
+  "dependencies": {
+    "phaser": "^3.24.1"
+  }
+}
