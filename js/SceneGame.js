@@ -32,18 +32,26 @@ class SceneGame extends Phaser.Scene {
 
         this.load.image('board-back', 'assets/img/board-back.png');
         this.load.image('board-front', 'assets/img/board-front.png');
+
+        this.load.image('btn-reset', 'assets/img/btn-reset.png');
     }
 
     create() {
         this.cameras.main.setBackgroundColor('#dddddd'); //white
 
+
         this.drawBoard();
         this.drawGhosts();
 
         this.showGhosts();
+
+        this.drawResetButton();
     }
 
     resetGame() {
+        this.pieceSprites.forEach(sprite => {
+            sprite.destroy();
+        })
         this.pieceSprites = [];
         this.clearBoard();
     }
@@ -124,6 +132,12 @@ class SceneGame extends Phaser.Scene {
         }
     }
 
+    drawResetButton() {
+        this.add.sprite(540, 150, 'btn-reset')
+            .setInteractive()
+            .on("pointerdown", this.resetGame.bind(this));
+    }
+
     hideGhosts() {
         this.ghostSprites.forEach(sprite => {
             sprite.visible = false;
@@ -190,6 +204,8 @@ class SceneGame extends Phaser.Scene {
 
         if (isWinner)
             console.log(isWinner);
+
+        //TODO: if full and no winner
 
         //END OF TURN
         //change player and change ghost
