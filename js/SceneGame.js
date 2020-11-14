@@ -120,7 +120,7 @@ class SceneGame extends Phaser.Scene {
                 .setData("col", col);
             ghostYellow.alpha = 0.2;
             ghostYellow.visible = false;
-            this.ghostYellowSprites.push(ghostRed);
+            this.ghostYellowSprites.push(ghostYellow);
         }
     }
 
@@ -181,10 +181,20 @@ class SceneGame extends Phaser.Scene {
 
         this.animatePlacePiece(rowPlaced, col, this.currentPlayer);
 
-        if (this.currentPlayer == 1)
+        //change player and change ghost
+        if (this.currentPlayer == 1) {
             this.currentPlayer = 2;
-        else if (this.currentPlayer == 2)
+
+            this.ghostRedSprites[col].visible = false;
+            this.ghostYellowSprites[col].visible = true;
+        }
+        else if (this.currentPlayer == 2) {
             this.currentPlayer = 1;
+
+            this.ghostRedSprites[col].visible = true;
+            this.ghostYellowSprites[col].visible = false;
+        }
+
     }
 
     /**
@@ -198,6 +208,10 @@ class SceneGame extends Phaser.Scene {
     placePiece(col, playerNum) {
         let pieceWasPlaced = false;
         let row = 0;
+
+        if (this.board[row][col] != 0)
+            return -1;
+
         //check each spot to see if there's something below it.
         for (; row < this.numRows; row++) {
             if (row == this.numRows - 1) {
@@ -248,7 +262,7 @@ class SceneGame extends Phaser.Scene {
             x: x,
             y: finalY,
             ease: "Linear",
-            duration: 200
+            duration: 300
         });
 
         this.pieceSprites.push(newPiece);
