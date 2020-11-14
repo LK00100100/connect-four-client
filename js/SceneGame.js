@@ -293,22 +293,13 @@ class SceneGame extends Phaser.Scene {
         if (this.checkHorizontalQuick(row, col, player)) //to right
             return true;
 
-        if (this.checkVerticalQuick(row - 3, col, player)) //to up
-            return true;
-
         if (this.checkVerticalQuick(row, col, player)) //to down
             return true;
 
         if (this.checkDiagonalSEQuick(row, col, player))
             return true;
 
-        if (this.checkDiagonalNEQuick(row, col, player))
-            return true;
-
-        if (this.checkDiagonalSEQuick(row - 3, col - 3, player))
-            return true;
-
-        if (this.checkDiagonalNEQuick(row + 3, col - 3, player))
+        if (this.checkDiagonalSWQuick(row, col, player))
             return true;
     }
 
@@ -369,18 +360,18 @@ class SceneGame extends Phaser.Scene {
     }
 
     /**
-     * Checks four diagonal towards north-east
+     * Checks four diagonal towards south-west
      * @param {Number} row 
      * @param {Number} col 
      * @param {Number} player 
      * @returns {Boolean} 
      */
-    checkDiagonalNEQuick(row, col, player) {
+    checkDiagonalSWQuick(row, col, player) {
         for (let i = 0; i < 4; i++) {
-            if (this.isOutOfBounds(row - i, col + i))
+            if (this.isOutOfBounds(row + i, col - i))
                 return false;
 
-            if (this.board[row - i][col + i] != player)
+            if (this.board[row + i][col - i] != player)
                 return false;
         }
 
