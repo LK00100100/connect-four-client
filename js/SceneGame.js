@@ -23,7 +23,6 @@ class SceneGame extends Phaser.Scene {
         this.ghostYellowSprites = [];
 
         this.piecePlacedSound;
-        this.initBoard();
     }
 
     preload() {
@@ -43,7 +42,9 @@ class SceneGame extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#dddddd'); //white
 
-        this.piecePlacedSound =  this.sound.add("piece-placed");
+        this.piecePlacedSound = this.sound.add("piece-placed");
+
+        this.initBoard();
 
         this.drawBoard();
         this.drawGhosts();
@@ -209,10 +210,13 @@ class SceneGame extends Phaser.Scene {
 
         let isWinner = this.checkVictoryQuick(rowPlaced, col);
 
-        if (isWinner)
-            console.log(isWinner);
-
-        //TODO: if full and no winner
+        if (isWinner){
+            alert(`player ${this.currentPlayer} winner`);
+        }
+        else{
+            if(this.isBoardFull())
+                alert("no winner");
+        }
 
         //END OF TURN
         //change player and change ghost
@@ -415,5 +419,18 @@ class SceneGame extends Phaser.Scene {
             return true;
 
         return false;
+    }
+
+    /**
+     * This just checks the top row to see if the board is full.
+     * @returns {Boolean}
+     */
+    isBoardFull() {
+        for (let col = 0; col < this.numCols; col++) {
+            if (this.board[0][col] == 0)
+                return false;
+        }
+
+        return true;
     }
 }
