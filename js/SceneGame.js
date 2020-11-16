@@ -210,11 +210,11 @@ class SceneGame extends Phaser.Scene {
 
         let isWinner = this.checkVictoryQuick(rowPlaced, col);
 
-        if (isWinner){
+        if (isWinner) {
             alert(`player ${this.currentPlayer} winner`);
         }
-        else{
-            if(this.isBoardFull())
+        else {
+            if (this.isBoardFull())
                 alert("no winner");
         }
 
@@ -327,6 +327,12 @@ class SceneGame extends Phaser.Scene {
             return true;
 
         if (this.checkDiagonalSWQuick(row, col, player))
+            return true;
+
+        if (this.checkDiagonalSEQuick(row - 3, col - 3, player))
+            return true;
+
+        if (this.checkDiagonalSWQuick(row - 3, col + 3, player))
             return true;
     }
 
