@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/LK00100100/connect-four-client#readme",
   "dependencies": {
+    "jquery": "^3.5.1",
     "phaser": "^3.24.1"
   }
 }

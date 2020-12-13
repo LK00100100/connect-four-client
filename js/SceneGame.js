@@ -7,6 +7,8 @@ class SceneGame extends Phaser.Scene {
     constructor() {
         super("SceneGame");
 
+        this.gameId = -1;
+
         //board drawing info
         this.startX = 64;   //col
         this.startY = 100;   //row
@@ -47,6 +49,14 @@ class SceneGame extends Phaser.Scene {
         this.showGhosts();
 
         this.drawResetButton();
+    }
+
+    /**
+     * 
+     * @param {String} newGameId 
+     */
+    setGameId(newGameId){
+        this.gameId = newGameId;
     }
 
     resetGame() {

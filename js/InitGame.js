@@ -7,7 +7,8 @@ let config = {
     audio: {
         disableWebAudio: true
     },
-    scene: [SceneGame]
+    scene: [SceneGame],
+    parent: "game-canvas"
 };
 
 var gameInstance = new Phaser.Game(config);

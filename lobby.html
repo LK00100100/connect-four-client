@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Four</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/lobby.css">
+    <title>Connect Four Lobby</title>
+
+    <script src="node_modules\jquery\dist\jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.24.1/phaser.min.js"
         integrity="sha512-HY/qPTJqpvoNGRufGPn4Tl7duHSam8NfrfTZUHyn5M39oEBcq8p6IeGBE9e+AupikS4Utt+uJhSgG3FYZp/yxA=="
@@ -15,14 +19,27 @@
     <script src="js/GameEngine.js" type="text/javascript" charset="utf-8"></script> <!-- call this before scene game -->
     <script src="js/SceneGame.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/InitGame.js" type="text/javascript" charset="utf-8"></script>
-
-    <p>
-        hello there
-    </p>
 </head>
 
 <body>
+    <div id="lobby">
+        <h1>Connect Four Lobby</h1>
+        <p>Hello there, this is the Connect Four Lobby</p>
+        <button id="btn-create-game">Create Game</button>
+        <br><br>
+        <button id="btn-refresh">Refresh</button>
 
+        <ul id="games-list">
+            <li>empty</li>
+        </ul>
+    </div>
+
+    <div id="game-canvas">
+        <!-- the phaser canvas will be magically inserted here when everything loads -->
+    </div>
+
+    <!-- load last -->
+    <script src="js/Lobby.js" type="text/javascript" charset="utf-8"></script>
 </body>
 
 </html>
