@@ -6,16 +6,11 @@ class SceneGame extends Phaser.Scene {
 
     constructor() {
         super("SceneGame");
-        this.numRows = 6;
-        this.numCols = 7;
-
-        this.currentPlayer = 1;
 
         //board drawing info
         this.startX = 64;   //col
         this.startY = 100;   //row
 
-        this.board; //2d int
         this.pieceSprites = [];
 
         this.ghostSprites = [];
@@ -23,6 +18,8 @@ class SceneGame extends Phaser.Scene {
         this.ghostYellowSprites = [];
 
         this.piecePlacedSound;
+
+        this.gameEngine = new GameEngine();
     }
 
     preload() {
@@ -44,9 +41,7 @@ class SceneGame extends Phaser.Scene {
 
         this.piecePlacedSound = this.sound.add("piece-placed");
 
-        this.initBoard();
-
-        this.drawBoard();
+        this.drawBoardBackground();
         this.drawGhosts();
 
         this.showGhosts();
@@ -59,38 +54,16 @@ class SceneGame extends Phaser.Scene {
             sprite.destroy();
         })
         this.pieceSprites = [];
-        this.clearBoard();
-    }
-
-    /**
-     * initializes the board with 0's.
-     */
-    initBoard() {
-        this.board = [];
-        for (let row = 0; row < this.numRows; row++) {
-            let newRow = [];
-            for (let col = 0; col < this.numCols; col++)
-                newRow.push(0);
-
-            this.board.push(newRow);
-        }
-    }
-
-    clearBoard() {
-        for (let row = 0; row < this.numRows; row++) {
-            for (let col = 0; col < this.numCols; col++) {
-                this.board[row][col] = 0;
-            }
-        }
+        this.gameEngine.clearBoard();
     }
 
     /**
      * Draws the front and back of the board.
      * Does not render the pieces.
      */
-    drawBoard() {
-        for (let row = 0; row < this.numRows; row++) {
-            for (let col = 0; col < this.numCols; col++) {
+    drawBoardBackground() {
+        for (let row = 0; row < this.gameEngine.numRows; row++) {
+            for (let col = 0; col < this.gameEngine.numCols; col++) {
 
                 let y = this.startY + (row * 64);
                 let x = this.startX + (col * 64);
@@ -108,7 +81,7 @@ class SceneGame extends Phaser.Scene {
     drawGhosts() {
 
         let y = this.startY - 64;
-        for (let col = 0; col < this.numCols; col++) {
+        for (let col = 0; col < this.gameEngine.numCols; col++) {
             let x = this.startX + (col * 64);
 
             let ghost = this.add.sprite(x, y, 'piece-ghost')
@@ -173,7 +146,7 @@ class SceneGame extends Phaser.Scene {
         let col = this.getData("col");
         let scene = this.scene;
 
-        if (scene.currentPlayer == 1)
+        if (scene.gameEngine.currentPlayer == 1)
             scene.ghostRedSprites[col].visible = true;
         else
             scene.ghostYellowSprites[col].visible = true;
@@ -187,7 +160,7 @@ class SceneGame extends Phaser.Scene {
         let col = this.getData("col");
         let scene = this.scene;
 
-        if (scene.currentPlayer == 1)
+        if (scene.gameEngine.currentPlayer == 1)
             scene.ghostRedSprites[col].visible = false;
         else
             scene.ghostYellowSprites[col].visible = false;
@@ -199,77 +172,40 @@ class SceneGame extends Phaser.Scene {
      * @param {Number} col the target column
      */
     attemptMoveAndDraw(col) {
-        let rowPlaced = this.placePiece(col, this.currentPlayer);
+        let rowPlaced = this.gameEngine.placePiece(col, this.gameEngine.currentPlayer);
 
         if (rowPlaced == -1)
             return;
 
-        this.animatePlacePiece(rowPlaced, col, this.currentPlayer);
+        this.animatePlacePiece(rowPlaced, col, this.gameEngine.currentPlayer);
 
         this.piecePlacedSound.play();
 
-        let isWinner = this.checkVictoryQuick(rowPlaced, col);
+        let isWinner = this.gameEngine.checkVictoryQuick(rowPlaced, col);
 
         if (isWinner) {
-            alert(`player ${this.currentPlayer} winner`);
+            alert(`player ${this.gameEngine.currentPlayer} winner`);
         }
         else {
-            if (this.isBoardFull())
+            if (this.gameEngine.isBoardFull())
                 alert("no winner");
         }
 
         //END OF TURN
         //change player and change ghost
-        if (this.currentPlayer == 1) {
-            this.currentPlayer = 2;
+        if (this.gameEngine.currentPlayer == 1) {
+            this.gameEngine.currentPlayer = 2;
 
             this.ghostRedSprites[col].visible = false;
             this.ghostYellowSprites[col].visible = true;
         }
-        else if (this.currentPlayer == 2) {
-            this.currentPlayer = 1;
+        else if (this.gameEngine.currentPlayer == 2) {
+            this.gameEngine.currentPlayer = 1;
 
             this.ghostRedSprites[col].visible = true;
             this.ghostYellowSprites[col].visible = false;
         }
 
-    }
-
-    /**
-     * drops a piece in the column.
-     * affects the data only.
-     * use this instead: attemptMoveAndDraw();
-     * @param {Number} col -
-     * @param {Number} playerNum -
-     * @returns {Number} the row of the piece played. otherwise -1;
-     */
-    placePiece(col, playerNum) {
-        let pieceWasPlaced = false;
-        let row = 0;
-
-        if (this.board[row][col] != 0)
-            return -1;
-
-        //check each spot to see if there's something below it.
-        for (; row < this.numRows; row++) {
-            if (row == this.numRows - 1) {
-                this.board[row][col] = playerNum;
-                pieceWasPlaced = true;
-                break;
-            }
-
-            //is there anything below?
-            if (this.board[row + 1][col] != 0) {
-                this.board[row][col] = playerNum;
-                pieceWasPlaced = true;
-                break;
-            }
-        }
-
-        if (pieceWasPlaced)
-            return row;
-        else
-            return -1;
     }
 
     /**
@@ -306,137 +242,4 @@ class SceneGame extends Phaser.Scene {
         this.pieceSprites.push(newPiece);
     }
 
-    /**
-     * Quickly check if the newly placed piece created a victory.
-     * @param {Number} row the newly placed piece
-     * @param {Number} col the newly placed piece
-     */
-    checkVictoryQuick(row, col) {
-        let player = this.board[row][col];
-
-        if (this.checkHorizontalQuick(row, col - 3, player)) //to left
-            return true;
-
-        if (this.checkHorizontalQuick(row, col, player)) //to right
-            return true;
-
-        if (this.checkVerticalQuick(row, col, player)) //to down
-            return true;
-
-        if (this.checkDiagonalSEQuick(row, col, player))
-            return true;
-
-        if (this.checkDiagonalSWQuick(row, col, player))
-            return true;
-
-        if (this.checkDiagonalSEQuick(row - 3, col - 3, player))
-            return true;
-
-        if (this.checkDiagonalSWQuick(row - 3, col + 3, player))
-            return true;
-    }
-
-    /**
-     * Checks four horizontal from left to right
-     * @param {Number} row 
-     * @param {Number} col 
-     * @param {Number} player 
-     */
-    checkHorizontalQuick(row, col, player) {
-        for (let i = 0; i < 4; i++) {
-            if (this.isOutOfBounds(row + i, col))
-                return false;
-
-            if (this.board[row + i][col] != player)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks four vertical from top to bottom
-     * @param {Number} row 
-     * @param {Number} col 
-     * @param {Number} player 
-     * @returns {Boolean} 
-     */
-    checkVerticalQuick(row, col, player) {
-        for (let i = 0; i < 4; i++) {
-            if (this.isOutOfBounds(row, col + i))
-                return false;
-
-            if (this.board[row][col + i] != player)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-    * Checks four diagonal towards south-east
-    * @param {Number} row 
-    * @param {Number} col 
-    * @param {Number} player 
-    * @returns {Boolean} 
-    */
-    checkDiagonalSEQuick(row, col, player) {
-        for (let i = 0; i < 4; i++) {
-            if (this.isOutOfBounds(row + i, col + i))
-                return false;
-
-            if (this.board[row + i][col + i] != player)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks four diagonal towards south-west
-     * @param {Number} row 
-     * @param {Number} col 
-     * @param {Number} player 
-     * @returns {Boolean} 
-     */
-    checkDiagonalSWQuick(row, col, player) {
-        for (let i = 0; i < 4; i++) {
-            if (this.isOutOfBounds(row + i, col - i))
-                return false;
-
-            if (this.board[row + i][col - i] != player)
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * 
-     * @param {Number} row 
-     * @param {Number} col 
-     * @returns {boolean} true if out of bounds.
-     */
-    isOutOfBounds(row, col) {
-        if (row < 0 || row >= this.board.length)
-            return true;
-
-        if (col < 0 || col >= this.board[0].length)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * This just checks the top row to see if the board is full.
-     * @returns {Boolean}
-     */
-    isBoardFull() {
-        for (let col = 0; col < this.numCols; col++) {
-            if (this.board[0][col] == 0)
-                return false;
-        }
-
-        return true;
-    }
 }
