@@ -103,6 +103,8 @@ class GameEngine {
 
         if (this.checkDiagonalSWQuick(row - 3, col + 3, player))
             return true;
+
+        return false;
     }
 
     /**

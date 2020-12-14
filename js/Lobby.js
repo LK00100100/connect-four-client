@@ -33,14 +33,36 @@ function displayGamesList(gamesList) {
 
     //load into html list
     gamesList.forEach(gameId => {
-        let buttonItem = $("<button>").text("join game");
-        let listItem = $("<li>").text("gameId: " + gameId);
-        listItem.append(buttonItem);
+        let listItem = createGameListItem(gameId);
 
         $gamesList.append(listItem);
     });
 
     console.log("refresh complete.");
+}
+
+/**
+ * create a list item for the games-list
+ * @param {String} gameId 
+ */
+function createGameListItem(gameId){
+    let buttonItem = $("<button>");
+    buttonItem.text("join game");
+
+    buttonItem.on("click", function(){
+        joinGame(gameId);
+    });
+
+    let listItem = $("<li>").text("gameId: " + gameId);
+    listItem.append(buttonItem);
+
+    return listItem;
+}
+
+function joinGame(gameId){
+    console.log(`joining: ${gameId}`);
+
+    turnOffLobbyTurnOnCanvas(gameId);
 }
 
 /**
@@ -50,11 +72,18 @@ function displayGamesList(gamesList) {
 function createNewGame(newGameId) {
     console.log("game was created.");
 
+    turnOffLobbyTurnOnCanvas(newGameId);
+}
+
+/**
+ * 
+ * @param {String} newGameId the game id to join
+ */
+function turnOffLobbyTurnOnCanvas(newGameId){
     $("#lobby").hide();
 
     console.log("turning on canvas.");
     gameInstance.scene.scenes[0].setGameId(newGameId);
-
     showGameCanvas();
 }
 
