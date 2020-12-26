@@ -1,13 +1,16 @@
+//TODO: on disconnect, don't attempt resync. you rage quitted.
+//TODO: get a playernumber assigned when joining a server
+//TODO: wait until you get a seat before showing the board.
 
 /**
  * The main scene that draws the board.
+ * With multiplayer logic
  */
-class SceneGame extends Phaser.Scene {
+class SceneGameMulti extends Phaser.Scene {
 
+    //TODO: separate web code
     constructor() {
-        super("SceneGame");
-
-        this.gameId = -1;
+        super("SceneGameMulti");
 
         //board drawing info
         this.startX = 64;   //col
@@ -22,6 +25,16 @@ class SceneGame extends Phaser.Scene {
         this.piecePlacedSound;
 
         this.gameEngine = new GameEngine();
+
+        /**
+         * Multiplayer
+         */
+        this.targetWebsocket = "http://localhost:5000/con4-ws";
+        this.stompClient = null;
+
+        this.gameId = -1;   //set by the server.
+
+        this.myUserId = "user" + Date.now; //TODO: rely on the servers to give you an actual id.
     }
 
     preload() {
@@ -48,7 +61,57 @@ class SceneGame extends Phaser.Scene {
 
         this.showGhosts();
 
-        this.drawResetButton();
+        //this.drawResetButton();
+    }
+
+    /**
+     * 
+     * @param {String} newGameId the unique game id we are going to play on
+     */
+    connectToWebSocket(newGameId) {
+        this.setGameId(newGameId);
+
+        //var socket = new SockJS('/gs-guide-websocket');
+        var socket = new SockJS(this.targetWebsocket);
+
+        this.stompClient = Stomp.over(socket);
+        let stompClient = this.stompClient;
+
+        let that = this;
+
+        stompClient.connect({}, function (frame) {
+            //setConnected(true);   //TODO: show the user they are connected on the UI
+            console.log('Connected: ' + frame);
+
+            let subscribeTo = `/topic/game/${newGameId}`;
+            stompClient.subscribe(subscribeTo, that.processLastMoveMessage);
+
+            subscribeTo = `/topic/game/${newGameId}/seat`;
+            stompClient.subscribe(subscribeTo, that.processGetGameSeat);
+
+            let sendTo = `/con4/game/${newGameId}/seat`;
+            stompClient.send(sendTo, {}, JSON.stringify({ 'gameId': newGameId }));
+        });
+
+        //TODO: disconnect code
+    }
+
+    /**
+     * processes incoming websocket messages.
+     * @param {*} gameMoveResult JSON of the last move.
+     */
+    processIncomingMessage(gameMoveResultJson) {
+        let gameMoveResult = JSON.parse(gameMoveResultJson.body);
+
+        console.log("msg received:" + gameMoveResult);
+    }
+
+
+    processGetGameSeat(playerNumJson) {
+        let playerNum = JSON.parse(playerNumJson.body);
+
+        console.log("got a seat!");
+        console.log(playerNum);
     }
 
     /**
@@ -57,6 +120,14 @@ class SceneGame extends Phaser.Scene {
      */
     setGameId(newGameId) {
         this.gameId = newGameId;
+    }
+
+    /**
+     * 
+     * @param {String} newWebSocket the target websocket url. ex: http:localhost:5000/con4-ws
+     */
+    setTargetWebSocket(newWebSocket) {
+        this.targetWebsocket = newWebSocket;
     }
 
     resetGame() {
@@ -144,8 +215,15 @@ class SceneGame extends Phaser.Scene {
 
         /** @type {SceneGame}*/
         let scene = this.scene;
+        //        scene.attemptMoveAndDraw(col);
 
-        scene.attemptMoveAndDraw(col);
+        //TODO: calculate validity locally
+
+        //this.playerNum = 
+        //let message =
+
+        let sendTo =  `/con4/game/${this.gameId}`;
+        this.stompClient.send(sendTo, {}, JSON.stringify({ 'name': $("#name").val() }));
     }
 
     /**

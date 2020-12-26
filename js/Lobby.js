@@ -62,7 +62,7 @@ function createGameListItem(gameId){
 function joinGame(gameId){
     console.log(`joining: ${gameId}`);
 
-    turnOffLobbyTurnOnCanvas(gameId);
+    turnOffLobbyTurnOnGameCanvas(gameId);
 }
 
 /**
@@ -72,18 +72,20 @@ function joinGame(gameId){
 function createNewGame(newGameId) {
     console.log("game was created.");
 
-    turnOffLobbyTurnOnCanvas(newGameId);
+    turnOffLobbyTurnOnGameCanvas(newGameId);
 }
 
 /**
  * 
  * @param {String} newGameId the game id to join
  */
-function turnOffLobbyTurnOnCanvas(newGameId){
+function turnOffLobbyTurnOnGameCanvas(newGameId){
     $("#lobby").hide();
 
     console.log("turning on canvas.");
-    gameInstance.scene.scenes[0].setGameId(newGameId);
+    let gameScene = gameInstance.scene.scenes[0];    
+    gameScene.connectToWebSocket(newGameId);
+    
     showGameCanvas();
 }
 

@@ -7,7 +7,7 @@ let config = {
     audio: {
         disableWebAudio: true
     },
-    scene: [SceneGame],
+    scene: [SceneGameMulti],
     parent: "game-canvas"
 };
 

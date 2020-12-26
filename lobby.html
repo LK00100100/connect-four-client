@@ -8,17 +8,24 @@
     <link rel="stylesheet" type="text/css" href="/css/lobby.css">
     <title>Connect Four Lobby</title>
 
-    <script src="node_modules\jquery\dist\jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <!--
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.24.1/phaser.min.js"
         integrity="sha512-HY/qPTJqpvoNGRufGPn4Tl7duHSam8NfrfTZUHyn5M39oEBcq8p6IeGBE9e+AupikS4Utt+uJhSgG3FYZp/yxA=="
         crossorigin="anonymous"></script>
     -->
+    <script src="node_modules/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="node_modules/sockjs-client/dist/sockjs.js"></script>
+    <script src="node_modules/stompjs/lib/stomp.min.js" type="text/javascript" charset="utf-8"></script>
+
     <script src="node_modules/phaser/dist/phaser.min.js"></script>
 
     <script src="js/GameEngine.js" type="text/javascript" charset="utf-8"></script> <!-- call this before scene game -->
-    <script src="js/SceneGame.js" type="text/javascript" charset="utf-8"></script>
+    <!-- <script src="js/SceneGame.js" type="text/javascript" charset="utf-8"></script> -->
+    <script src="js/SceneGameMulti.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/InitGame.js" type="text/javascript" charset="utf-8"></script>
+    
 </head>
 
 <body>
