@@ -27,14 +27,15 @@ class SceneGameMulti extends Phaser.Scene {
         this.gameEngine = new GameEngine();
 
         /**
-         * Multiplayer
+         * Multiplayer data for this game instance.
          */
         this.targetWebsocket = "http://localhost:5000/con4-ws";
         this.stompClient = null;
 
-        this.gameId = -1;   //set by the server.
-
-        this.myUserId = "user" + Date.now; //TODO: rely on the servers to give you an actual id.
+        this.gameId = -1;   //set by server.
+        this.myUserId = "user" + Date.now(); //TODO: rely on the servers to give you an actual id.
+        this.myPlayerNum = -1;   //set by server
+        this.players = [];
     }
 
     preload() {
@@ -52,7 +53,7 @@ class SceneGameMulti extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBackgroundColor('#dddddd'); //white
+        this.cameras.main.setBackgroundColor('#dddddd'); //white-ish
 
         this.piecePlacedSound = this.sound.add("piece-placed");
 
@@ -60,8 +61,6 @@ class SceneGameMulti extends Phaser.Scene {
         this.drawGhosts();
 
         this.showGhosts();
-
-        //this.drawResetButton();
     }
 
     /**
@@ -77,41 +76,101 @@ class SceneGameMulti extends Phaser.Scene {
         this.stompClient = Stomp.over(socket);
         let stompClient = this.stompClient;
 
-        let that = this;
-
         stompClient.connect({}, function (frame) {
             //setConnected(true);   //TODO: show the user they are connected on the UI
             console.log('Connected: ' + frame);
 
-            let subscribeTo = `/topic/game/${newGameId}`;
-            stompClient.subscribe(subscribeTo, that.processLastMoveMessage);
+            //any moves
+            let subscribeTo = `/topic/game/${newGameId}/move`;
+            stompClient.subscribe(subscribeTo, this.processLastMoveMessage.bind(this));
 
-            subscribeTo = `/topic/game/${newGameId}/seat`;
-            stompClient.subscribe(subscribeTo, that.processGetGameSeat);
+            //game status changes
+            subscribeTo = `/topic/game/${newGameId}/status`;
+            stompClient.subscribe(subscribeTo, this.processGameStatusChange.bind(this));
 
-            let sendTo = `/con4/game/${newGameId}/seat`;
-            stompClient.send(sendTo, {}, JSON.stringify({ 'gameId': newGameId }));
-        });
+            //when anyone sits down (even you)
+            subscribeTo = `/topic/game/${newGameId}/seat/`;
+            stompClient.subscribe(subscribeTo, this.processGetGameSeat.bind(this));
 
-        //TODO: disconnect code
+            let sendTo = `/con4/game/${newGameId}/seat/user/${this.myUserId}`;
+            stompClient.send(sendTo, {}, JSON.stringify({
+                'gameId': newGameId,
+                'userId': this.myUserId
+            }));
+        }.bind(this));
+
+        //TODO: handle disconnect code
     }
 
     /**
      * processes incoming websocket messages.
      * @param {*} gameMoveResult JSON of the last move.
      */
-    processIncomingMessage(gameMoveResultJson) {
+    processLastMoveMessage(gameMoveResultJson) {
         let gameMoveResult = JSON.parse(gameMoveResultJson.body);
 
         console.log("msg received:" + gameMoveResult);
     }
 
+    /**
+     * called when anyone tries to sit down.
+     * Go back to lobby on self failure.
+     * @param {*} seatTakenMessage 
+     */
+    processGetGameSeat(seatTakenMessage) {
+        let message = JSON.parse(seatTakenMessage.body);
+        let userId = message.userId;    //some player trying to sit down.
+        let playerNum = message.playerNum;  //their server assigned seat number
 
-    processGetGameSeat(playerNumJson) {
-        let playerNum = JSON.parse(playerNumJson.body);
+        //is it my seat?
+        if (userId == this.myUserId) {
+            //didn't get seat
+            if (playerNum == -1) {
+                console.log("failed to get a seat.");
+                alert("failed to get a seat."); //TODO: ghetto. use fancier div.
 
-        console.log("got a seat!");
-        console.log(playerNum);
+                this.disconnectGame();
+
+                theLobby.turnOnLobbyOnly();
+                return;
+            }
+            //got seat
+            else {
+                this.players.push(userId);
+
+                this.myPlayerNum = playerNum;
+                console.log(`got a seat! you are playerNum: ${playerNum}`);
+                alert(`got a seat! you are playerNum: ${playerNum}`); //TODO: ghetto. use div
+            }
+
+        }
+        //other players 
+        else {
+            //got seat
+            if (playerNum != -1) {
+                this.players.push(userId);
+            }
+        }
+
+        //display players
+        let playersText = this.players.join(", ");
+        $("#game-text").text(playersText);
+    }
+
+    /**
+     * Server calls this whenever the game changed its state.
+     * @param {*} gameStatusMessageJson 
+     */
+    processGameStatusChange(gameStatusMessageJson) {
+
+        let message = JSON.parse(seatTakenMessage.body);
+
+    }
+
+    disconnectGame() {
+        if (this.stompClient !== null) {
+            this.stompClient.disconnect();
+        }
     }
 
     /**
@@ -192,12 +251,6 @@ class SceneGameMulti extends Phaser.Scene {
         }
     }
 
-    drawResetButton() {
-        this.add.sprite(540, 150, 'btn-reset')
-            .setInteractive()
-            .on("pointerdown", this.resetGame.bind(this));
-    }
-
     hideGhosts() {
         this.ghostSprites.forEach(sprite => {
             sprite.visible = false;
@@ -222,7 +275,7 @@ class SceneGameMulti extends Phaser.Scene {
         //this.playerNum = 
         //let message =
 
-        let sendTo =  `/con4/game/${this.gameId}`;
+        let sendTo = `/con4/game/${this.gameId}`;
         this.stompClient.send(sendTo, {}, JSON.stringify({ 'name': $("#name").val() }));
     }
 

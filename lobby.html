@@ -22,7 +22,6 @@
     <script src="node_modules/phaser/dist/phaser.min.js"></script>
 
     <script src="js/GameEngine.js" type="text/javascript" charset="utf-8"></script> <!-- call this before scene game -->
-    <!-- <script src="js/SceneGame.js" type="text/javascript" charset="utf-8"></script> -->
     <script src="js/SceneGameMulti.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/InitGame.js" type="text/javascript" charset="utf-8"></script>
     
@@ -37,11 +36,13 @@
         <button id="btn-refresh">Refresh</button>
 
         <ul id="games-list">
-            <li>empty</li>
+            <li>Needs refresh...</li>
         </ul>
     </div>
 
     <div id="game-canvas">
+        <button id="btn-lobby">Quit game</button>
+        <p id="game-text">...<p>
         <!-- the phaser canvas will be magically inserted here when everything loads -->
     </div>
 

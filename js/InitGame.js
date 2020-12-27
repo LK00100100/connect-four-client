@@ -11,4 +11,5 @@ let config = {
     parent: "game-canvas"
 };
 
+//TODO: use some final init'er
 var gameInstance = new Phaser.Game(config);
