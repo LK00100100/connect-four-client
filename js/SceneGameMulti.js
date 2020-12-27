@@ -32,14 +32,16 @@ class SceneGameMulti extends Phaser.Scene {
 
         /**
          * Multiplayer data for this game instance.
+         * Initialized by initScene()
          */
         this.targetWebsocket = "http://localhost:5000/con4-ws";
         this.stompClient = null;
 
-        this.gameId = -1;   //set by server.
+        this.gameId;   //set by server.
         this.myUserId = "user" + Date.now(); //TODO: rely on the servers to give you an actual id.
-        this.myPlayerNum = -1;   //set by server
-        this.players = [];
+        this.myPlayerNum;   //set by server
+        this.players;
+        this.gameState; //values of: WAIT, PLAY, END
     }
 
     /**
@@ -47,6 +49,12 @@ class SceneGameMulti extends Phaser.Scene {
      */
     initScene(newGameId) {
         $("#game-text").text("");
+
+        this.stompClient = null;
+        this.gameId = -1;
+        this.myPlayerNum = -1;
+        this.players = [];
+        this.gameState = "WAIT";
 
         this.getGameInstance(newGameId,
             function () {
@@ -75,6 +83,9 @@ class SceneGameMulti extends Phaser.Scene {
         }.bind(this));
     }
 
+    /**
+     * Called only once by phaser to preload assets.
+     */
     preload() {
         this.load.image('piece-ghost', 'assets/img/ghost.png');
         this.load.image('piece-red', 'assets/img/red.png');
@@ -89,6 +100,9 @@ class SceneGameMulti extends Phaser.Scene {
         this.load.audio('piece-placed', ['assets/audio/squit.ogg']);
     }
 
+    /**
+     * Called only once by phaser.
+     */
     create() {
         this.cameras.main.setBackgroundColor('#dddddd'); //white-ish
 
@@ -120,8 +134,8 @@ class SceneGameMulti extends Phaser.Scene {
             stompClient.subscribe(subscribeTo, this.processLastMoveMessage.bind(this));
 
             //game status changes
-            subscribeTo = `/topic/game/${newGameId}/status`;
-            stompClient.subscribe(subscribeTo, this.processGameStatusChange.bind(this));
+            subscribeTo = `/topic/game/${newGameId}/state`;
+            stompClient.subscribe(subscribeTo, this.processGameStateChange.bind(this));
 
             //when anyone sits down (even you)
             subscribeTo = `/topic/game/${newGameId}/seat`;
@@ -195,11 +209,21 @@ class SceneGameMulti extends Phaser.Scene {
 
     /**
      * Server calls this whenever the game changed its state.
-     * @param {*} gameStatusMessageJson 
+     * @param {*} gameStateMessageJson 
      */
-    processGameStatusChange(gameStatusMessageJson) {
+    processGameStateChange(gameStateMessageJson) {
+        let gameState = JSON.parse(seatTakenMessage.body);
 
-        let message = JSON.parse(seatTakenMessage.body);
+        switch(gameState){
+            case "PLAY":
+                this.gameState = "PLAY";
+                break;
+            case "END":
+                this.gameState = "END";
+                break;
+            default:
+                console.log(`Unknown gamestate: ${gameState}`)
+        }
 
     }
 
