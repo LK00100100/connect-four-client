@@ -7,7 +7,7 @@ class Lobby {
     constructor() {
 
         this.initButtons();
-        this.con4ServerUrl = "http://localhost:5000";
+        this.con4ServerUrl = "http://localhost:5000";   //TODO: settable
 
         this.gameInstance;
     }
@@ -106,7 +106,7 @@ class Lobby {
     }
 
     /**
-     * 
+     * Turns on the game scene. Does a bit of initializing.
      * @param {String} newGameId the game id to join
      */
     turnOnGameCanvasOnly(newGameId) {
@@ -114,7 +114,7 @@ class Lobby {
 
         console.log("turning on canvas.");
         let gameScene = this.gameInstance.scene.scenes[0];
-        gameScene.connectToWebSocket(newGameId);
+        gameScene.initScene(newGameId);
 
         this.showGameCanvas();
     }

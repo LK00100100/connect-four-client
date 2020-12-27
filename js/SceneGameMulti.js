@@ -14,6 +14,8 @@ class SceneGameMulti extends Phaser.Scene {
     constructor() {
         super("SceneGameMulti");
 
+        this.con4ServerUrl = "http://localhost:5000";   //TODO: settable
+
         //board drawing info
         this.startX = 64;   //col
         this.startY = 100;   //row
@@ -38,6 +40,39 @@ class SceneGameMulti extends Phaser.Scene {
         this.myUserId = "user" + Date.now(); //TODO: rely on the servers to give you an actual id.
         this.myPlayerNum = -1;   //set by server
         this.players = [];
+    }
+
+    /**
+     * Call this everytime before showing this scene to get things set up.
+     */
+    initScene(newGameId) {
+        $("#game-text").text("");
+
+        this.getGameInstance(newGameId,
+            function () {
+                this.connectToWebSocket(newGameId);
+            }.bind(this)
+        );
+
+    }
+
+    /**
+     * download the latest game instance.
+     * then setup websockets.
+     * Called once once by initScene();
+     * @param {String} newGameId 
+     * @param {Function} callback called at the end
+     */
+    getGameInstance(newGameId, callback) {
+        let targetUrl = this.con4ServerUrl + `/game/${newGameId}`;
+
+        $.get(targetUrl, function (data) {
+            this.players = data.players;
+
+            if (callback != null)
+                callback();
+
+        }.bind(this));
     }
 
     preload() {
@@ -66,12 +101,10 @@ class SceneGameMulti extends Phaser.Scene {
     }
 
     /**
-     * 
+     * Connects to various web sockets. Called only by initGame();
      * @param {String} newGameId the unique game id we are going to play on
      */
     connectToWebSocket(newGameId) {
-        this.setGameId(newGameId);
-
         //var socket = new SockJS('/gs-guide-websocket');
         var socket = new SockJS(this.targetWebsocket);
 
