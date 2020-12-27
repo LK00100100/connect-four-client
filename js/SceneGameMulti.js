@@ -89,7 +89,7 @@ class SceneGameMulti extends Phaser.Scene {
             stompClient.subscribe(subscribeTo, this.processGameStatusChange.bind(this));
 
             //when anyone sits down (even you)
-            subscribeTo = `/topic/game/${newGameId}/seat/`;
+            subscribeTo = `/topic/game/${newGameId}/seat`;
             stompClient.subscribe(subscribeTo, this.processGetGameSeat.bind(this));
 
             let sendTo = `/con4/game/${newGameId}/seat/user/${this.myUserId}`;

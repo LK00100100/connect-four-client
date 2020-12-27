@@ -11,5 +11,20 @@ let config = {
     parent: "game-canvas"
 };
 
-//TODO: use some final init'er
-var gameInstance = new Phaser.Game(config);
+var theLobby;
+
+//last thing to do: on load up
+$(function () {
+
+    var gameInstance = new Phaser.Game(config);
+
+    theLobby = new Lobby();
+    theLobby.gameInstance = gameInstance;
+
+    //there's only one canvas. it's the phaser canvas
+    $("#game-canvas").hide();
+
+    theLobby.getGamesList();
+});
+
+//TODO: make a load screen

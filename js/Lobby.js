@@ -113,7 +113,7 @@ class Lobby {
         $("#lobby").hide();
 
         console.log("turning on canvas.");
-        let gameScene = gameInstance.scene.scenes[0];
+        let gameScene = this.gameInstance.scene.scenes[0];
         gameScene.connectToWebSocket(newGameId);
 
         this.showGameCanvas();
@@ -127,21 +127,10 @@ class Lobby {
         $("#lobby").show();
 
         console.log("turning off canvas.");
-        let sceneGameMulti = gameInstance.scene.scenes[0];
+        let sceneGameMulti = this.gameInstance.scene.scenes[0];
         sceneGameMulti.disconnectGame();
 
         this.hideGameCanvas();
     }
 
 }
-
-var theLobby = new Lobby();
-
-$(function () {
-    //there's only one canvas. it's the phaser canvas
-    $("game-canvas").hide();
-
-    theLobby.getGamesList();
-});
-
-//TODO: make a load screen
