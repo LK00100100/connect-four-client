@@ -2,6 +2,8 @@
 //TODO: get a playernumber assigned when joining a server
 //TODO: wait until you get a seat before showing the board.
 
+//TODO: on join, get all current players
+
 /**
  * The main scene that draws the board.
  * With multiplayer logic
@@ -118,16 +120,17 @@ class SceneGameMulti extends Phaser.Scene {
      * @param {*} seatTakenMessage 
      */
     processGetGameSeat(seatTakenMessage) {
-        let message = JSON.parse(seatTakenMessage.body);
-        let userId = message.userId;    //some player trying to sit down.
-        let playerNum = message.playerNum;  //their server assigned seat number
+        let seatMsg = JSON.parse(seatTakenMessage.body);
+        let userId = seatMsg.userId;    //some player trying to sit down.
+        let playerNum = seatMsg.playerNum;  //their server assigned seat number
+        let message = seatMsg.message;
 
         //is it my seat?
         if (userId == this.myUserId) {
             //didn't get seat
             if (playerNum == -1) {
-                console.log("failed to get a seat.");
-                alert("failed to get a seat."); //TODO: ghetto. use fancier div.
+                console.log(message);
+                alert(message); //TODO: ghetto. use fancier div.
 
                 this.disconnectGame();
 
