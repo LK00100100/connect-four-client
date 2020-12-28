@@ -74,7 +74,7 @@ class GameEngine {
         else
             return -1;
     }
-    
+
     /**
      * Quickly check if the newly placed piece created a victory.
      * @param {Number} row the newly placed piece

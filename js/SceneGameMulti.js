@@ -175,8 +175,8 @@ class SceneGameMulti extends Phaser.Scene {
             this.gameState = "END";
             alert("victory for: " + playerNum);
         }
-        else{
-            if(isBoardFull){
+        else {
+            if (isBoardFull) {
                 alert("tie!");
             }
         }
