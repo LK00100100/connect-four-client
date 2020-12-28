@@ -7,6 +7,10 @@ work in progress
 
 It's connect four.
 
+The other half:
+
+https://github.com/LK00100100/connect-four-server
+
 ## Installation and Startup
 You'll need to download the phaser library so type this:
 ```
