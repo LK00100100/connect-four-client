@@ -173,7 +173,8 @@ class SceneGameMulti extends Phaser.Scene {
 
         if (wasWinning) {
             this.gameState = "END";
-            alert("victory for: " + playerNum);
+            $("#game-text").text(`game over. victory for: ${playerNum}`);
+            alert(`game over. victory for: ${playerNum}`);   //TODO: replace
         }
         else {
             if (isBoardFull) {
