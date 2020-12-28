@@ -50,8 +50,9 @@ class SceneGameMulti extends Phaser.Scene {
     initScene(newGameId) {
         $("#game-text").text("");
 
+        //some of these will be set by the server.
         this.stompClient = null;
-        this.gameId = -1;
+        this.gameId = newGameId;
         this.myPlayerNum = -1;
         this.players = [];
         this.gameState = "WAIT";
@@ -157,8 +158,30 @@ class SceneGameMulti extends Phaser.Scene {
      */
     processLastMoveMessage(gameMoveResultJson) {
         let gameMoveResult = JSON.parse(gameMoveResultJson.body);
+        let playerNum = gameMoveResult.playerNum;
+        let col = gameMoveResult.col;
+        //let placedRow = gameMoveResult.placedRow;
+
+        let wasValid = gameMoveResult.wasValid;
+        let wasWinning = gameMoveResult.wasWinning;
+        let isBoardFull = gameMoveResult.isBoardFull;
 
         console.log("msg received:" + gameMoveResult);
+
+        if (!wasValid)
+            return; //do nothing for now
+
+        if (wasWinning) {
+            this.gameState = "END";
+            alert("victory for: " + playerNum);
+        }
+        else{
+            if(isBoardFull){
+                alert("tie!");
+            }
+        }
+
+        this.attemptMoveAndDraw(col);
     }
 
     /**
@@ -212,9 +235,9 @@ class SceneGameMulti extends Phaser.Scene {
      * @param {*} gameStateMessageJson 
      */
     processGameStateChange(gameStateMessageJson) {
-        let gameState = JSON.parse(seatTakenMessage.body);
+        let gameState = JSON.parse(gameStateMessageJson.body);
 
-        switch(gameState){
+        switch (gameState) {
             case "PLAY":
                 this.gameState = "PLAY";
                 break;
@@ -256,6 +279,9 @@ class SceneGameMulti extends Phaser.Scene {
         this.pieceSprites = [];
         this.gameEngine.clearBoard();
     }
+
+    //TODO: refactor - drawing class
+    //TODO: refactor - websocket receive class
 
     /**
      * Draws the front and back of the board.
@@ -323,20 +349,34 @@ class SceneGameMulti extends Phaser.Scene {
         });
     }
 
+    /**
+     * called by ghost Sprite when clicked.
+     */
     ghostClicked() {
-        let col = this.getData("col");
+        let targetCol = this.getData("col");
 
-        /** @type {SceneGame}*/
+        /** @type {SceneGameMulti}*/
         let scene = this.scene;
-        //        scene.attemptMoveAndDraw(col);
 
         //TODO: calculate validity locally
 
-        //this.playerNum = 
-        //let message =
+        //do nothing on non-PLAY state
+        if (scene.gameState != "PLAY")
+            return;
 
-        let sendTo = `/con4/game/${this.gameId}`;
-        this.stompClient.send(sendTo, {}, JSON.stringify({ 'name': $("#name").val() }));
+        //not our turn!
+        if (scene.gameEngine.currentPlayer != scene.myPlayerNum)
+            return;
+
+        //TODO: authz token
+
+        let move = {
+            "playerNum": scene.myPlayerNum,
+            "col": targetCol
+        }
+
+        let sendTo = `/con4/game/${scene.gameId}/move`;
+        scene.stompClient.send(sendTo, {}, JSON.stringify(move));
     }
 
     /**
@@ -382,16 +422,6 @@ class SceneGameMulti extends Phaser.Scene {
 
         //TODO: adjust sound later. somewhat annoying
         //this.piecePlacedSound.play();
-
-        let isWinner = this.gameEngine.checkVictoryQuick(rowPlaced, col);
-
-        if (isWinner) {
-            alert(`player ${this.gameEngine.currentPlayer} winner`);
-        }
-        else {
-            if (this.gameEngine.isBoardFull())
-                alert("no winner");
-        }
 
         //END OF TURN
         //change player and change ghost
