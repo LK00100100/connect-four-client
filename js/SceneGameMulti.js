@@ -391,9 +391,10 @@ class SceneGameMulti extends Phaser.Scene {
      */
     ghostHoverOn() {
         let col = this.getData("col");
+        /** @type {SceneGameMulti} */
         let scene = this.scene;
 
-        if (scene.gameEngine.currentPlayer == 1)
+        if (scene.myPlayerNum == 1)
             scene.ghostRedSprites[col].visible = true;
         else
             scene.ghostYellowSprites[col].visible = true;
@@ -405,9 +406,11 @@ class SceneGameMulti extends Phaser.Scene {
      */
     ghostHoverOff() {
         let col = this.getData("col");
+
+        /** @type {SceneGameMulti} */
         let scene = this.scene;
 
-        if (scene.gameEngine.currentPlayer == 1)
+        if (scene.myPlayerNum == 1)
             scene.ghostRedSprites[col].visible = false;
         else
             scene.ghostYellowSprites[col].visible = false;
@@ -433,15 +436,9 @@ class SceneGameMulti extends Phaser.Scene {
         //change player and change ghost
         if (this.gameEngine.currentPlayer == 1) {
             this.gameEngine.currentPlayer = 2;
-
-            this.ghostRedSprites[col].visible = false;
-            this.ghostYellowSprites[col].visible = true;
         }
         else if (this.gameEngine.currentPlayer == 2) {
             this.gameEngine.currentPlayer = 1;
-
-            this.ghostRedSprites[col].visible = true;
-            this.ghostYellowSprites[col].visible = false;
         }
 
     }
