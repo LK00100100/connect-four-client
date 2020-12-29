@@ -29,13 +29,17 @@ class GameEngine {
         }
     }
 
-
     clearBoard() {
         for (let row = 0; row < this.numRows; row++) {
             for (let col = 0; col < this.numCols; col++) {
                 this.board[row][col] = 0;
             }
         }
+    }
+
+    resetGame(){
+        this.clearBoard();
+        this.currentPlayer = 1;
     }
 
     /**

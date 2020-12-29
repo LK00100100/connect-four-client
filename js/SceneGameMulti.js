@@ -63,6 +63,8 @@ class SceneGameMulti extends Phaser.Scene {
             }.bind(this)
         );
 
+        this.clearBoard();
+
     }
 
     /**
@@ -273,7 +275,10 @@ class SceneGameMulti extends Phaser.Scene {
         this.targetWebsocket = newWebSocket;
     }
 
-    resetGame() {
+    /**
+     * Erases the board. Sprites and data.
+     */
+    clearBoard() {
         this.pieceSprites.forEach(sprite => {
             sprite.destroy();
         })
