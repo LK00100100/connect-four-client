@@ -1,4 +1,6 @@
 
+//TODO: failure sending message to server text
+
 /**
  * Contains game Lobby logic
  */
@@ -56,8 +58,8 @@ class Lobby {
         $gamesList.html("");
 
         //load into html list
-        gamesList.forEach(gameId => {
-            let listItem = this.createGameListItem(gameId);
+        gamesList.forEach(gameInstanceBasicInfo => {
+            let listItem = this.createGameListItem(gameInstanceBasicInfo);
 
             $gamesList.append(listItem);
         });
@@ -73,18 +75,27 @@ class Lobby {
 
     /**
      * create a list item for the games-list
-     * @param {String} gameId 
+     * @param {GameInstanceBasicInfo} gameInstanceBasicInfo 
      */
-    createGameListItem(gameId) {
-        let buttonItem = $("<button>");
-        buttonItem.text("join game");
+    createGameListItem(gameInstanceBasicInfo) {
+        let gameId = gameInstanceBasicInfo.gameId;
+        let numPlayers = gameInstanceBasicInfo.numPlayers;
+        let state = gameInstanceBasicInfo.state;
 
-        buttonItem.on("click", function () {
-            this.joinGame(gameId);
-        }.bind(this));
+        let text = `gameId: ${gameId} | Players: ${numPlayers}/2`;
+        let listItem = $("<li>").text(text);
 
-        let listItem = $("<li>").text("gameId: " + gameId);
-        listItem.append(buttonItem);
+        //append the button last
+        if (numPlayers < 2) {
+            let buttonItem = $("<button>");
+            buttonItem.text("Join");
+
+            buttonItem.on("click", function () {
+                this.joinGame(gameId);
+            }.bind(this));
+
+            listItem.append(buttonItem);
+        }
 
         return listItem;
     }
