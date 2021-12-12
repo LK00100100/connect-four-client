@@ -3,7 +3,9 @@
 ![RepoSize](https://img.shields.io/github/repo-size/LK00100100/connect-four-client.svg)
 ![GitHub stars](https://img.shields.io/github/stars/LK00100100/connect-four-client.svg?style=social)
 
-work in progress
+abandoned project!
+
+note: could just module import for javascript. mark in html as es6 module scripts.
 
 It's connect four.
 
